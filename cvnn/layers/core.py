@@ -173,7 +173,9 @@ class ComplexDense(Dense, ComplexLayer):
                  kernel_initializer="ComplexGlorotUniform",
                  bias_initializer="Zeros",
                  kernel_regularizer=None,
-                 kernel_constraint=None,
+                 #kernel_constraint=None,
+                 kernel_constraint_r=None,
+                 kernel_constraint_i=None,
                  dtype=DEFAULT_COMPLEX_TYPE,  # TODO: Check typing of this.
                  init_technique: str = 'mirror',
                  **kwargs):
@@ -200,7 +202,9 @@ class ComplexDense(Dense, ComplexLayer):
         super(ComplexDense, self).__init__(units, activation=activation, use_bias=use_bias,
                                            kernel_initializer=kernel_initializer,
                                            bias_initializer=bias_initializer,
-                                           kernel_constraint=kernel_constraint, kernel_regularizer=kernel_regularizer,
+                                           #kernel_constraint=kernel_constraint, kernel_regularizer=kernel_regularizer,
+                                           kernel_constraint_r=kernel_constraint_r, kernel_constraint_i=kernel_constraint_i,
+                                           kernel_regularizer=kernel_regularizer,
                                            **kwargs)
         # !Cannot override dtype of the layer because it has a read-only @property
         self.my_dtype = tf.dtypes.as_dtype(dtype)
@@ -231,7 +235,8 @@ class ComplexDense(Dense, ComplexLayer):
                                      dtype=self.my_dtype.real_dtype,
                                      initializer=self.kernel_initializer,
                                      trainable=True,
-                                     constraint=self.kernel_constraint, regularizer=self.kernel_regularizer)
+                                     #constraint=self.kernel_constraint, regularizer=self.kernel_regularizer)
+                                     constraint=self.kernel_constraint_r, regularizer=self.kernel_regularizer)
             #self.w_r = tf.Variable(
             #    name='kernel_r',
             #    initial_value=self.kernel_initializer(shape=(input_shape[-1], self.units), dtype=i_kernel_dtype),
@@ -242,7 +247,8 @@ class ComplexDense(Dense, ComplexLayer):
                                      dtype=self.my_dtype.real_dtype,
                                      initializer=self.kernel_initializer,
                                      trainable=True,
-                                     constraint=self.kernel_constraint, regularizer=self.kernel_regularizer)
+                                     #constraint=self.kernel_constraint, regularizer=self.kernel_regularizer)
+                                     constraint=self.kernel_constraint_i, regularizer=self.kernel_regularizer)
             #self.w_i = tf.Variable(
             #    name='kernel_i',
             #    initial_value=i_kernel_initializer(shape=(input_shape[-1], self.units), dtype=i_kernel_dtype),
@@ -266,7 +272,8 @@ class ComplexDense(Dense, ComplexLayer):
                                      dtype=self.my_dtype,
                                      initializer=self.kernel_initializer,
                                      trainable=True,
-                                     constraint=self.kernel_constraint, regularizer=self.kernel_regularizer)
+                                     #constraint=self.kernel_constraint, regularizer=self.kernel_regularizer)
+                                     constraint=self.kernel_constraint_r, regularizer=self.kernel_regularizer)
             if self.use_bias:
                 self.b = self.add_weight('bias', shape=(self.units,), dtype=self.my_dtype,
                                          initializer=self.bias_initializer, trainable=self.use_bias)
@@ -298,7 +305,8 @@ class ComplexDense(Dense, ComplexLayer):
         return ComplexDense(units=int(round(self.units * output_multiplier)),
                             activation=self.activation, use_bias=self.use_bias,
                             kernel_initializer=self.kernel_initializer, bias_initializer=self.bias_initializer,
-                            kernel_constraint=self.kernel_constraint, kernel_regularizer=self.kernel_regularizer, #MODIFIED CODE ------
+                            #kernel_constraint=self.kernel_constraint, kernel_regularizer=self.kernel_regularizer, #MODIFIED CODE ------
+                            kernel_constraint=self.kernel_constraint_r, kernel_regularizer=self.kernel_regularizer,
                             dtype=self.my_dtype.real_dtype, name=self.name + "_real_equiv")
 
     def get_config(self):
